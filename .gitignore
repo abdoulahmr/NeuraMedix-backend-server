@@ -1,0 +1,6 @@
+services/models
+nltk_data/
+core/__pycache__/
+extracted_images/
+venv/
+db.sqlite3

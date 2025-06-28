@@ -1,0 +1,51 @@
+\documentclass[preprint,12pt]{elsarticle}
+
+\usepackage{graphicx}
+\usepackage{lineno}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{geometry} 
+\usepackage{booktabs}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+\geometry{margin=1in}
+
+\modulolinenumbers[5]
+
+\journal{Journal Name}
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{ {{ metadata.title | latex_escape }} }
+
+{% for author in metadata.authors %}
+\author[aff{{ author.affiliation }}]{ {{ author.name | latex_escape }} }
+{% endfor %}
+
+{% for affiliation in metadata.affiliations %}
+\address[aff{{ loop.index }}]{ {{ affiliation | latex_escape }} }
+{% endfor %}
+
+\begin{abstract}
+{{ abstract | latex_escape }}
+\end{abstract}
+
+\begin{keyword}
+{% for kw in keywords %}
+  {{ kw | latex_escape }}{% if not loop.last %}, {% endif %}
+{% endfor %}
+\end{keyword}
+
+\end{frontmatter}
+
+{% for section in sections %}
+\section*{ {{ section.title | latex_escape }} }
+
+{{ section.content | safe }}
+
+{% endfor %}
+
+\end{document}
