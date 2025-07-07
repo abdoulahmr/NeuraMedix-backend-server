@@ -264,7 +264,7 @@ def ihc_insight_view(request):
 # This view accepts an image file, processes it to detect cells, and returns the results.
 @api_view(['POST'])
 @csrf_exempt
-@permission_classes([IsAuthenticated])
+#@permission_classes([IsAuthenticated])
 def cell_detection_view(request):
     if request.method == 'POST' and request.FILES.get('image'):
         image_file = request.FILES['image']
