@@ -9,8 +9,8 @@ from .views import (
     research_analyzer_view,
     heart_disease_prediction_view,
     lung_cancer_prediction_view,
-    lung_cancer_detection_view,
-    auto_publish_view
+    auto_publish_view,
+    lungiq_ct_analysis_view
 )
 
 
@@ -27,8 +27,8 @@ urlpatterns = [
     path('research_analyzer/', research_analyzer_view),
     path('heart_disease_prediction/', heart_disease_prediction_view),
     path('lung_cancer_prediction/', lung_cancer_prediction_view),
-    path('lung_cancer_detection/', lung_cancer_detection_view),
     path('auto_publish/', auto_publish_view),
+    path('lungiq/', lungiq_ct_analysis_view),
 
     # user profile endpoints
     path('user_notes/', user_notes_view),

@@ -48,9 +48,12 @@ def generate_summary(text, task="summary"):
 # --- KEYWORDS ---
 def extract_keywords(text, max_keywords=10):
     cleaned = clean_text(text)
-    extractor = yake.KeywordExtractor(lan="en", n=1, top=max_keywords)
-    keywords = extractor.extract_keywords(cleaned)
-    return [kw for kw, _ in keywords]
+    try:
+        extractor = yake.KeywordExtractor(lan="en", n=1, top=max_keywords)
+        keywords = extractor.extract_keywords(cleaned)
+        return [kw for kw, _ in keywords]
+    except Exception as e:
+        return [f"Keyword extraction error: {str(e)}"]
 
 # --- IMAGE EXTRACTOR ---
 def image_extractor(pdf_path, output_dir="extracted_images", return_base64=False):
@@ -59,31 +62,37 @@ def image_extractor(pdf_path, output_dir="extracted_images", return_base64=False
     extracted_images = []
 
     for page_index, page in enumerate(doc):
-        images = page.get_images(full=True)
-        for img_index, img in enumerate(images):
-            xref = img[0]
-            base_image = doc.extract_image(xref)
-            image_bytes = base_image["image"]
-            image_ext = base_image["ext"]
-            image_name = f"page{page_index+1}_img{img_index+1}.{image_ext}"
-            image_path = os.path.join(output_dir, image_name)
+        try:
+            images = page.get_images(full=True)
+            for img_index, img in enumerate(images):
+                try:
+                    xref = img[0]
+                    base_image = doc.extract_image(xref)
+                    image_bytes = base_image["image"]
+                    image_ext = base_image["ext"]
+                    image_name = f"page{page_index+1}_img{img_index+1}.{image_ext}"
+                    image_path = os.path.join(output_dir, image_name)
 
-            with open(image_path, "wb") as f:
-                f.write(image_bytes)
+                    with open(image_path, "wb") as f:
+                        f.write(image_bytes)
 
-            image_info = {
-                "filename": image_name,
-                "ext": image_ext,
-                "page": page_index + 1,
-                "index": img_index + 1,
-            }
+                    image_info = {
+                        "filename": image_name,
+                        "ext": image_ext,
+                        "page": page_index + 1,
+                        "index": img_index + 1,
+                    }
 
-            if return_base64:
-                image_info["base64"] = base64.b64encode(image_bytes).decode("utf-8")
-            else:
-                image_info["path"] = image_path
+                    if return_base64:
+                        image_info["base64"] = base64.b64encode(image_bytes).decode("utf-8")
+                    else:
+                        image_info["path"] = image_path
 
-            extracted_images.append(image_info)
+                    extracted_images.append(image_info)
+                except Exception as e:
+                    extracted_images.append({"error": f"Image extraction failed on page {page_index+1}, image {img_index+1}: {str(e)}"})
+        except Exception as e:
+            extracted_images.append({"error": f"Image extraction failed on page {page_index+1}: {str(e)}"})
 
     return extracted_images
 

@@ -41,10 +41,8 @@ from .heart_disease_prediction import (
 from .lung_cancer_prediction import (
     predict_pulmonary_disease
 )
-from .lung_cancer_detection import (
-    predict_lung_cancer_from_image
-)
 from .auto_publish import generate_report_from_form
+from .lungiq import analyze_ct_slice
 
 ########################################################################################
 #  Authentication and User Registration
@@ -344,29 +342,6 @@ def lung_cancer_prediction_view(request):
 
     except Exception as e:
         return Response({'error': f'Invalid input: {str(e)}'}, status=500)
-
-# Lung cancer detection view
-# This view accepts an image file, processes it to predict lung cancer, and returns the results
-@api_view(['POST'])
-@parser_classes([MultiPartParser])
-def lung_cancer_detection_view(request):
-    if 'image' not in request.FILES:
-        return Response({'error': 'CT scan image is required.'}, status=400)
-
-    try:
-        image_file = request.FILES['image']
-        image_bytes = image_file.read()
-
-        prediction, probability, annotated_image = predict_lung_cancer_from_image(image_bytes)
-
-        return Response({
-            'prediction': prediction,
-            'probability': round(probability, 2),
-            'annotated_image': annotated_image
-        })
-
-    except Exception as e:
-        return Response({'error': str(e)}, status=500)
     
 # Research analyzer view
 # This view accepts a PDF file, extracts text, summarizes it, and extracts keywords.
@@ -441,3 +416,19 @@ def auto_publish_view(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+# LungIQ CT slice analysis view
+@api_view(['POST'])
+#@permission_classes([IsAuthenticated])
+def lungiq_ct_analysis_view(request):
+    if request.method != 'POST':
+        return Response({'error': 'Only POST method allowed'}, status=405)
+
+    if 'image' not in request.FILES:
+        return Response({'error': 'Image file is required'}, status=400)
+
+    image_file = request.FILES['image']
+    try:
+        result = analyze_ct_slice(image_file)
+        return Response(result)
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
